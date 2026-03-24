@@ -37,10 +37,6 @@ static int select(int action, int maxAction,int active,Vector2 position, int dis
         Raylib.DrawRectangleLines((int)position.X,distance*action+(int)position.Y,size*5/2,size,Color.Yellow);
         return action;
     }
-static int attack(int basedmg)
-{
-    return basedmg;
-}
 static void bar(int measurement,int maxMeasurement,string measurementName,int textsize, Vector2 position,Color boxColor, Color barColor)// draws a box with a 
 {
     Raylib.DrawRectangleV(position,new Vector2(measurementName.Length*textsize/4*3,textsize+4),boxColor);
@@ -48,6 +44,9 @@ static void bar(int measurement,int maxMeasurement,string measurementName,int te
     string measurementLengt= measurement.ToString();
     Raylib.DrawRectangleV(new Vector2((int)position.X+measurementName.Length*textsize/4*3,(int)position.Y),new Vector2(measurementLengt.Length*textsize/4*3,textsize+4),boxColor);
     Raylib.DrawText(measurementLengt,4+(int)position.X+measurementName.Length*textsize/4*3,(int)position.Y+2,textsize,Color.White);
+    Raylib.DrawRectangleV(new Vector2((int)position.X+measurementName.Length*textsize/4*3+measurementLengt.Length*textsize/4*3,(int)position.Y),new Vector2(textsize*5,textsize+4),boxColor);
+    Raylib.DrawRectangleV(new Vector2((int)position.X+measurementName.Length*textsize/4*3+measurementLengt.Length*textsize/4*3,(int)position.Y+2),new Vector2(measurement/maxMeasurement*textsize*5,textsize-2),barColor);
+    Raylib.DrawRectangleLines((int)position.X,(int)position.Y,measurementName.Length*textsize/4*3+measurementLengt.Length*textsize/4*3+textsize*5,textsize+4,Color.Black);
 }
 while(!Raylib.WindowShouldClose())
 {
@@ -76,6 +75,9 @@ while(!Raylib.WindowShouldClose())
         {
             gameState=4;
         }
+        bar(
+            playerHealth,maxPlayerHealth,"HP",16,new Vector2(650,30),blackHalfTransparent,Color.Red
+        );
         Raylib.EndDrawing();
     }
     //arena
@@ -123,6 +125,10 @@ while(!Raylib.WindowShouldClose())
         if(Raylib.IsKeyPressed(KeyboardKey.A)){skill=0;}
         }
     }
+    if (playerturn==false)
+        {
+            
+        }
                     //skill menu
                 //defend
             // enemy turn
