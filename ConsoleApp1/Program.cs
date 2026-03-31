@@ -3,15 +3,23 @@ using System.Numerics;
 using Raylib_cs;
 Raylib.InitWindow(800, 600, "Waa");
 Raylib.SetTargetFPS(60);
-int day = 0;
+int day = 1;
 int currency=0;
 int gameState =0;
-bool playerturn=true;
+bool playerturn=false;
+bool enemyselected=false;
 int selectAction1=1;
 int selectAction2=1;
 int skill=0;
 int maxPlayerHealth=100;
 int playerHealth = maxPlayerHealth;
+int magicPoint=100;
+int maxMagicPoint=100;
+int enemylevel;
+int enemyMaxHealt=0;
+int enemyHealt=0;
+int damage;
+int baseAttackdamage=5;
 List<string> skills=["","","","",""] ;
 Color blackHalfTransparent = new(0, 0, 0, 128);
 static void optionBoxes(List<Vector2> options,List<string> optionsText, int textSize, Color c){ // draws black boxes with text inside      
@@ -45,7 +53,8 @@ static void bar(int measurement,int maxMeasurement,string measurementName,int te
     Raylib.DrawRectangleV(new Vector2((int)position.X+measurementName.Length*textsize/4*3,(int)position.Y),new Vector2(measurementLengt.Length*textsize/4*3,textsize+4),boxColor);
     Raylib.DrawText(measurementLengt,4+(int)position.X+measurementName.Length*textsize/4*3,(int)position.Y+2,textsize,Color.White);
     Raylib.DrawRectangleV(new Vector2((int)position.X+measurementName.Length*textsize/4*3+measurementLengt.Length*textsize/4*3,(int)position.Y),new Vector2(textsize*5,textsize+4),boxColor);
-    Raylib.DrawRectangleV(new Vector2((int)position.X+measurementName.Length*textsize/4*3+measurementLengt.Length*textsize/4*3,(int)position.Y+2),new Vector2(measurement/maxMeasurement*textsize*5,textsize-2),barColor);
+    float percentage=measurement/maxMeasurement;
+    Raylib.DrawRectangleV(new Vector2((int)position.X+measurementName.Length*textsize/4*3+measurementLengt.Length*textsize/4*3,(int)position.Y+2),new Vector2(percentage*textsize*5,textsize-2),barColor);//The bar itself
     Raylib.DrawRectangleLines((int)position.X,(int)position.Y,measurementName.Length*textsize/4*3+measurementLengt.Length*textsize/4*3+textsize*5,textsize+4,Color.Black);
 }
 while(!Raylib.WindowShouldClose())
@@ -75,9 +84,8 @@ while(!Raylib.WindowShouldClose())
         {
             gameState=4;
         }
-        bar(
-            playerHealth,maxPlayerHealth,"HP",16,new Vector2(650,30),blackHalfTransparent,Color.Red
-        );
+        bar(playerHealth,maxPlayerHealth,"HP",16,new Vector2(650,30),blackHalfTransparent,Color.Red);
+        bar(magicPoint,maxMagicPoint,"MP",16,new Vector2(650,60),blackHalfTransparent,Color.Blue);
         Raylib.EndDrawing();
     }
     //arena
@@ -86,9 +94,10 @@ while(!Raylib.WindowShouldClose())
     {
         Raylib.BeginDrawing();
         Raylib.ClearBackground(Color.White);
-        bar(
-            playerHealth, maxPlayerHealth, "HP", 40, new Vector2(30,550), blackHalfTransparent, Color.Red
-        );
+        bar(playerHealth, maxPlayerHealth, "HP", 40, new Vector2(30,500), blackHalfTransparent, Color.Red);
+        bar(magicPoint, maxMagicPoint, "MP", 40, new Vector2(30,550), blackHalfTransparent, Color.SkyBlue);
+        if(enemyselected==true){
+        bar(enemyHealt, enemyMaxHealt, "HP", 30, new Vector2(550,20), blackHalfTransparent, Color.Red);}
         if (playerturn==true){
         optionBoxes(
             [new Vector2(30,300),new Vector2(30,350),new Vector2(30,400),new Vector2(30,450) ],
@@ -110,11 +119,17 @@ while(!Raylib.WindowShouldClose())
             if(selectAction1==4){skill=4;}
         }
         //skills
+        if (skill == 1)
+            {
+            damage=baseAttackdamage*(1+Random.Shared.Next(3));
+            enemyHealt=enemyHealt-damage;
+            playerturn=false;
+            }
         if (skill == 2)
         {
             optionBoxes(
             [new Vector2(140,250),new Vector2(140,290),new Vector2(140,330),new Vector2(140,370), new Vector2(140,410) ],
-            [skills[1],skills[2],skills[3],skills[4],skills[5]],
+            skills,
             18,
             blackHalfTransparent
         );
@@ -127,7 +142,21 @@ while(!Raylib.WindowShouldClose())
     }
     if (playerturn==false)
         {
-            
+            if (enemyselected == false){
+                enemylevel=enemyselect(day);
+                enemyMaxHealt=50+enemylevel*(2+Random.Shared.Next(5));
+                enemyHealt=enemyMaxHealt;
+                enemyselected=true;
+            }
+
+            skill=0;
+            playerturn=true;
+        }
+        if (enemyHealt <= 0)
+        {
+            enemyselected=false;
+            playerturn=false;
+            gameState=0;
         }
                     //skill menu
                 //defend
@@ -149,4 +178,16 @@ while(!Raylib.WindowShouldClose())
         //rest
             // restore Healt and change day
 
+}
+static int enemyselect(int day)
+{
+    return day+Random.Shared.Next(3);
+}
+static int enemyattack(int level, int defend)
+{
+    return level*Random.Shared.Next(5)+5/defend;
+}
+static int enemyattacked(int level, int damage, int debuff)
+{
+    return damage+debuff-(level/Random.Shared.Next(4));
 }
