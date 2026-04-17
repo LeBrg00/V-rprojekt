@@ -15,11 +15,12 @@ int maxPlayerHealth=100;
 int playerHealth = maxPlayerHealth;
 int magicPoint=100;
 int maxMagicPoint=100;
-int enemylevel;
+int enemylevel=1;
 int enemyMaxHealt=0;
 int enemyHealt=0;
 int damage;
 int baseAttackdamage=5;
+int defence=1;
 List<string> skills=["","","","",""] ;
 Color blackHalfTransparent = new(0, 0, 0, 128);
 static void optionBoxes(List<Vector2> options,List<string> optionsText, int textSize, Color c){ // draws black boxes with text inside      
@@ -27,7 +28,7 @@ static void optionBoxes(List<Vector2> options,List<string> optionsText, int text
         {
             Raylib.DrawRectangleV(options[i],new Vector2(textSize*5,textSize*2),c);
             Raylib.DrawRectangleLines((int)options[i].X,(int)options[i].Y,textSize*5,textSize*2,Color.Black);
-            Raylib.DrawText(optionsText[i],(int)options[i].X+10, (int)options[i].Y+15,textSize,Color.White);
+            Raylib.DrawText(optionsText[i],(int)options[i].X+10, (int)options[i].Y+textSize/2,textSize,Color.White);
         }
 }
 static int select(int action, int maxAction,int active,Vector2 position, int distance,int size)//apply´s a yellow overlay on the edge of a box and outputs a int
@@ -46,14 +47,16 @@ static int select(int action, int maxAction,int active,Vector2 position, int dis
         return action;
     }
 static void bar(int measurement,int maxMeasurement,string measurementName,int textsize, Vector2 position,Color boxColor, Color barColor)// draws a box with a 
-{
+{//Draws a bar with a name and the value to the left. The bar has a set length multiplied by the measurement divided by the maxeasurement
     Raylib.DrawRectangleV(position,new Vector2(measurementName.Length*textsize/4*3,textsize+4),boxColor);
     Raylib.DrawText(measurementName,(int)position.X+4,(int)position.Y+2,textsize,Color.White);
     string measurementLengt= measurement.ToString();
     Raylib.DrawRectangleV(new Vector2((int)position.X+measurementName.Length*textsize/4*3,(int)position.Y),new Vector2(measurementLengt.Length*textsize/4*3,textsize+4),boxColor);
     Raylib.DrawText(measurementLengt,4+(int)position.X+measurementName.Length*textsize/4*3,(int)position.Y+2,textsize,Color.White);
     Raylib.DrawRectangleV(new Vector2((int)position.X+measurementName.Length*textsize/4*3+measurementLengt.Length*textsize/4*3,(int)position.Y),new Vector2(textsize*5,textsize+4),boxColor);
-    float percentage=measurement/maxMeasurement;
+    float a=measurement;
+    float b=maxMeasurement;
+    float percentage=a/b;
     Raylib.DrawRectangleV(new Vector2((int)position.X+measurementName.Length*textsize/4*3+measurementLengt.Length*textsize/4*3,(int)position.Y+2),new Vector2(percentage*textsize*5,textsize-2),barColor);//The bar itself
     Raylib.DrawRectangleLines((int)position.X,(int)position.Y,measurementName.Length*textsize/4*3+measurementLengt.Length*textsize/4*3+textsize*5,textsize+4,Color.Black);
 }
@@ -64,7 +67,6 @@ while(!Raylib.WindowShouldClose())
     {
         Raylib.BeginDrawing();
         Raylib.ClearBackground(Color.White);
-
         List<Vector2> option = [new Vector2(340,100),new Vector2(100,270),new Vector2(560,270),new Vector2(340,440),];
         List<string> optionsTex= ["Arena(W)", "skills(A)", "shop(D)", "Rest(S)"];
         optionBoxes(option, optionsTex, 28, blackHalfTransparent);
@@ -78,14 +80,15 @@ while(!Raylib.WindowShouldClose())
         }
         if (Raylib.IsKeyPressed(KeyboardKey.S))
         {
-            gameState=3;
+            gameState=4;
         }
         if (Raylib.IsKeyPressed(KeyboardKey.D))
         {
-            gameState=4;
+            gameState=3;
         }
         bar(playerHealth,maxPlayerHealth,"HP",16,new Vector2(650,30),blackHalfTransparent,Color.Red);
         bar(magicPoint,maxMagicPoint,"MP",16,new Vector2(650,60),blackHalfTransparent,Color.Blue);
+        optionBoxes([new Vector2(710,90)],["Souls: "+currency],16,blackHalfTransparent);
         Raylib.EndDrawing();
     }
     //arena
@@ -128,7 +131,7 @@ while(!Raylib.WindowShouldClose())
         if (skill == 2)
         {
             optionBoxes(
-            [new Vector2(140,250),new Vector2(140,290),new Vector2(140,330),new Vector2(140,370), new Vector2(140,410) ],
+            [new Vector2(140,250),new Vector2(140,290),new Vector2(140,330),new Vector2(140,370), new Vector2(140,410)],
             skills,
             18,
             blackHalfTransparent
@@ -138,30 +141,46 @@ while(!Raylib.WindowShouldClose())
         new Vector2(140,210),40,36
         );
         if(Raylib.IsKeyPressed(KeyboardKey.A)){skill=0;}
+                if (Raylib.IsKeyPressed(KeyboardKey.D))
+                {
+                    
+                }
         }
+
     }
     if (playerturn==false)
         {
+            if (enemyselected == true)
+            {
+                playerHealth=playerHealth-enemyattack(enemylevel,defence);
+            }
             if (enemyselected == false){
                 enemylevel=enemyselect(day);
                 enemyMaxHealt=50+enemylevel*(2+Random.Shared.Next(5));
                 enemyHealt=enemyMaxHealt;
                 enemyselected=true;
             }
-
             skill=0;
             playerturn=true;
         }
         if (enemyHealt <= 0)
         {
+            currency= currency+(enemylevel*(50+Random.Shared.Next(50)));
             enemyselected=false;
             playerturn=false;
             gameState=0;
         }
-                    //skill menu
-                //defend
-            // enemy turn
-                //chooses enemytype       
+        if (playerHealth <= 0)
+        {
+            gameState=5;
+        }       
+        Raylib.EndDrawing();
+    }
+    if (gameState == 2)
+    {
+        Raylib.BeginDrawing();
+        Raylib.ClearBackground(Color.White);
+        optionBoxes([new Vector2(170,50),new Vector2(170,100)],["skill 1","skill 2"],20, blackHalfTransparent);
         Raylib.EndDrawing();
     }
     if (gameState == 4)
@@ -169,6 +188,13 @@ while(!Raylib.WindowShouldClose())
         playerHealth=maxPlayerHealth;
         day++;
         gameState=0;
+    }
+    if (gameState == 5)
+    {
+        Raylib.BeginDrawing();
+        Raylib.ClearBackground(Color.White);
+        Raylib.DrawText("You lose",250,260,80,Color.Black);
+        Raylib.EndDrawing();
     }
         //shop
             //shop menu
