@@ -3,25 +3,26 @@ using System.Numerics;
 using Raylib_cs;
 Raylib.InitWindow(800, 600, "Waa");
 Raylib.SetTargetFPS(60);
-int day = 1;
-int currency=0;
-int gameState =0;
-bool playerturn=false;
-bool enemyselected=false;
-int selectAction1=1;
-int selectAction2=1;
-int skill=0;
-int maxPlayerHealth=100;
-int playerHealth = maxPlayerHealth;
-int magicPoint=100;
-int maxMagicPoint=100;
-int enemylevel=1;
-int enemyMaxHealt=0;
-int enemyHealt=0;
-int damage;
+int day = 1; //Gets larger when rested and increases enemys healt and damage
+int currency=0; // used to buy and upgrade skills and items
+int gameState =0; // determines if in hub, battle, skill menu, shop, resting or have lost
+bool playerturn=false; //determines if its the players turn
+bool enemyselected=false; // determines if the enemys healt and base damage have been determined.
+int selectAction1=1;// determines what action is highlighted in battle.
+int selectAction2=1;// determines what skill is selected.
+int skill=0; // determines if you have opened the skill menu in battle.
+int maxPlayerHealth=100; // the players max healt
+int playerHealth = maxPlayerHealth; // Players current healt
+int magicPoint=100; // Used for skill
+int maxMagicPoint=100; // maximum amount of magic points.
+int enemylevel=1; // determines enemies base attack and health.
+int enemyMaxHealt=0;//maximum health of a enemy
+int enemyHealt=0; // current healt of a enemy
+int damage; 
 int baseAttackdamage=5;
 int defence=1;
-List<string> skills=["","","","",""] ;
+List<string> skills=["","","","",""];
+List<string> skillDescription=["Deals a large amount of damage"];
 Color blackHalfTransparent = new(0, 0, 0, 128);
 static void optionBoxes(List<Vector2> options,List<string> optionsText, int textSize, Color c){ // draws black boxes with text inside      
     for (int i = 0; i < options.Count; i++)
@@ -73,10 +74,12 @@ while(!Raylib.WindowShouldClose())
         if (Raylib.IsKeyPressed(KeyboardKey.W))
         {
             gameState=1;
+            selectAction1=1;
         }
         if (Raylib.IsKeyPressed(KeyboardKey.A))
         {
             gameState=2;
+            selectAction1=1;
         }
         if (Raylib.IsKeyPressed(KeyboardKey.S))
         {
@@ -180,7 +183,13 @@ while(!Raylib.WindowShouldClose())
     {
         Raylib.BeginDrawing();
         Raylib.ClearBackground(Color.White);
-        optionBoxes([new Vector2(170,50),new Vector2(170,100)],["skill 1","skill 2"],20, blackHalfTransparent);
+        if(Raylib.IsKeyPressed(KeyboardKey.A)){gameState=0;}
+        optionBoxes([new Vector2(170,50),new Vector2(170,100),new Vector2(170,150),new Vector2(170,200),new Vector2(170,250)],["skill 1","skill 2","skill 3","skill 4","skill 5" ],20, blackHalfTransparent);
+        selectAction1=select(selectAction1,5,0,new Vector2(170,0),50,40);
+        //List<string> skillDescription=["Deals a large amount of damage"];
+        Raylib.DrawRectangleV(new Vector2(320,50),new Vector2(300,400),blackHalfTransparent);
+        Raylib.DrawRectangleLines(320,50,300,400,Color.Black);
+        Raylib.DrawText(skillDescription[1],330,60,28,Color.White);
         Raylib.EndDrawing();
     }
     if (gameState == 4)
