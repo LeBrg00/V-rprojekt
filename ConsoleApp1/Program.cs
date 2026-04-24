@@ -1,10 +1,11 @@
-﻿
+﻿//Everything commented that isnt informative is code for features that havent been implemented and at the moment breaks the game if triggered.
+//Unless the game tells you otherwise you use W and S to move up and down and A and D to move back an forth between menus.
 using System.Numerics;
 using Raylib_cs;
 Raylib.InitWindow(800, 600, "Waa");
 Raylib.SetTargetFPS(60);
 int day = 1; //Gets larger when rested and increases enemys healt and damage
-int currency=0; // used to buy and upgrade skills and items
+int currency=0; // used to buy and upgrade skills and items. Currently useless
 int gameState =0; // determines if in hub, battle, skill menu, shop, resting or have lost
 bool playerturn=false; //determines if its the players turn
 bool enemyselected=false; // determines if the enemys healt and base damage have been determined.
@@ -13,8 +14,8 @@ int selectAction2=1;// determines what skill is selected.
 int skill=0; // determines if you have opened the skill menu in battle.
 int maxPlayerHealth=100; // the players max healt
 int playerHealth = maxPlayerHealth; // Players current healt
-int magicPoint=100; // Used for skill
-int maxMagicPoint=100; // maximum amount of magic points.
+int magicPoint=100; // Used for skill. Currently useless
+int maxMagicPoint=100; // maximum amount of magic points. Also currently useless.
 int enemylevel=1; // determines enemies base attack and health.
 int enemyMaxHealt=0;//maximum health of a enemy
 int enemyHealt=0; // current healt of a enemy
@@ -22,7 +23,7 @@ int damage;
 int baseAttackdamage=5;
 int defence=1;
 List<string> skills=["","","","",""];
-List<string> skillDescription=["Deals a large amount of damage"];
+List<string> skillDescription=["Deals a large amount of damage","Use mana to heal","Weakens enemys attacks","Weakens enemys defence","Gives an attack bonus"];
 Color blackHalfTransparent = new(0, 0, 0, 128);
 static void optionBoxes(List<Vector2> options,List<string> optionsText, int textSize, Color c){ // draws black boxes with text inside      
     for (int i = 0; i < options.Count; i++)
@@ -61,6 +62,15 @@ static void bar(int measurement,int maxMeasurement,string measurementName,int te
     Raylib.DrawRectangleV(new Vector2((int)position.X+measurementName.Length*textsize/4*3+measurementLengt.Length*textsize/4*3,(int)position.Y+2),new Vector2(percentage*textsize*5,textsize-2),barColor);//The bar itself
     Raylib.DrawRectangleLines((int)position.X,(int)position.Y,measurementName.Length*textsize/4*3+measurementLengt.Length*textsize/4*3+textsize*5,textsize+4,Color.Black);
 }
+static int notImplemented(int size,Vector2 position,int resetValue,int startValue, Color c)//Makes a box that says things doesnt work and returns to original state. Doesnt work
+{
+    Raylib.DrawRectangleV(position,new Vector2(size*8,size*2),c);
+    Raylib.DrawRectangleLines((int)position.X,(int)position.Y,size*8,size*2,Color.Black);
+    Raylib.DrawText("Not implemented, A to go back",(int)position.X+10, (int)position.Y+size/2,size,Color.White);
+    if (Raylib.IsKeyPressed(KeyboardKey.A))
+    {return resetValue;}
+    else{return startValue;}
+}
 while(!Raylib.WindowShouldClose())
 {
     // menu
@@ -87,7 +97,7 @@ while(!Raylib.WindowShouldClose())
         }
         if (Raylib.IsKeyPressed(KeyboardKey.D))
         {
-            gameState=3;
+            //gameState=3;
         }
         bar(playerHealth,maxPlayerHealth,"HP",16,new Vector2(650,30),blackHalfTransparent,Color.Red);
         bar(magicPoint,maxMagicPoint,"MP",16,new Vector2(650,60),blackHalfTransparent,Color.Blue);
@@ -121,8 +131,8 @@ while(!Raylib.WindowShouldClose())
         {
             if(selectAction1==1){skill=1;}
             if(selectAction1==2){skill=2;}
-            if(selectAction1==3){skill=3;}
-            if(selectAction1==4){skill=4;}
+            //if(selectAction1==3){skill=3;}
+            //if(selectAction1==4){skill=4;}
         }
         //skills
         if (skill == 1)
@@ -186,11 +196,14 @@ while(!Raylib.WindowShouldClose())
         if(Raylib.IsKeyPressed(KeyboardKey.A)){gameState=0;}
         optionBoxes([new Vector2(170,50),new Vector2(170,100),new Vector2(170,150),new Vector2(170,200),new Vector2(170,250)],["skill 1","skill 2","skill 3","skill 4","skill 5" ],20, blackHalfTransparent);
         selectAction1=select(selectAction1,5,0,new Vector2(170,0),50,40);
-        //List<string> skillDescription=["Deals a large amount of damage"];
-        Raylib.DrawRectangleV(new Vector2(320,50),new Vector2(300,400),blackHalfTransparent);
-        Raylib.DrawRectangleLines(320,50,300,400,Color.Black);
-        Raylib.DrawText(skillDescription[1],330,60,28,Color.White);
+        Raylib.DrawRectangleV(new Vector2(320,50),new Vector2(450,400),blackHalfTransparent);
+        Raylib.DrawRectangleLines(320,50,450,400,Color.Black);
+        Raylib.DrawText(skillDescription[selectAction1-1],330,60,28,Color.White);
         Raylib.EndDrawing();
+    }
+    if (gameState == 3)
+    {
+        notImplemented(40,new Vector2(220,260),0,3,blackHalfTransparent);
     }
     if (gameState == 4)
     {
