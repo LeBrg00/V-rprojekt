@@ -25,7 +25,7 @@ int defence=1;
 List<string> skills=["","","","",""];
 List<string> skillDescription=["Deals a large amount of damage","Use mana to heal","Weakens enemys attacks","Weakens enemys defence","Gives an attack bonus"];
 Color blackHalfTransparent = new(0, 0, 0, 128);
-static void optionBoxes(List<Vector2> options,List<string> optionsText, int textSize, Color c){ // draws black boxes with text inside      
+static void OptionBoxes(List<Vector2> options,List<string> optionsText, int textSize, Color c){ // draws black boxes with text inside      
     for (int i = 0; i < options.Count; i++)
         {
             Raylib.DrawRectangleV(options[i],new Vector2(textSize*5,textSize*2),c);
@@ -33,7 +33,7 @@ static void optionBoxes(List<Vector2> options,List<string> optionsText, int text
             Raylib.DrawText(optionsText[i],(int)options[i].X+10, (int)options[i].Y+textSize/2,textSize,Color.White);
         }
 }
-static int select(int action, int maxAction,int active,Vector2 position, int distance,int size)//apply´s a yellow overlay on the edge of a box and outputs a int
+static int Select(int action, int maxAction,int active,Vector2 position, int distance,int size)//apply´s a yellow overlay on the edge of a box and outputs a int
     {
         if (Raylib.IsKeyPressed(KeyboardKey.S)&&active==0)
         {
@@ -48,7 +48,7 @@ static int select(int action, int maxAction,int active,Vector2 position, int dis
         Raylib.DrawRectangleLines((int)position.X,distance*action+(int)position.Y,size*5/2,size,Color.Yellow);
         return action;
     }
-static void bar(int measurement,int maxMeasurement,string measurementName,int textsize, Vector2 position,Color boxColor, Color barColor)// draws a box with a 
+static void Bar(int measurement,int maxMeasurement,string measurementName,int textsize, Vector2 position,Color boxColor, Color barColor)// draws a box with a 
 {//Draws a bar with a name and the value to the left. The bar has a set length multiplied by the measurement divided by the maxeasurement
     Raylib.DrawRectangleV(position,new Vector2(measurementName.Length*textsize/4*3,textsize+4),boxColor);
     Raylib.DrawText(measurementName,(int)position.X+4,(int)position.Y+2,textsize,Color.White);
@@ -62,15 +62,6 @@ static void bar(int measurement,int maxMeasurement,string measurementName,int te
     Raylib.DrawRectangleV(new Vector2((int)position.X+measurementName.Length*textsize/4*3+measurementLengt.Length*textsize/4*3,(int)position.Y+2),new Vector2(percentage*textsize*5,textsize-2),barColor);//The bar itself
     Raylib.DrawRectangleLines((int)position.X,(int)position.Y,measurementName.Length*textsize/4*3+measurementLengt.Length*textsize/4*3+textsize*5,textsize+4,Color.Black);
 }
-static int notImplemented(int size,Vector2 position,int resetValue,int startValue, Color c)//Makes a box that says things doesnt work and returns to original state. Doesnt work
-{
-    Raylib.DrawRectangleV(position,new Vector2(size*8,size*2),c);
-    Raylib.DrawRectangleLines((int)position.X,(int)position.Y,size*8,size*2,Color.Black);
-    Raylib.DrawText("Not implemented, A to go back",(int)position.X+10, (int)position.Y+size/2,size,Color.White);
-    if (Raylib.IsKeyPressed(KeyboardKey.A))
-    {return resetValue;}
-    else{return startValue;}
-}
 while(!Raylib.WindowShouldClose())
 {
     // menu
@@ -80,7 +71,7 @@ while(!Raylib.WindowShouldClose())
         Raylib.ClearBackground(Color.White);
         List<Vector2> option = [new Vector2(340,100),new Vector2(100,270),new Vector2(560,270),new Vector2(340,440),];
         List<string> optionsTex= ["Arena(W)", "skills(A)", "shop(D)", "Rest(S)"];
-        optionBoxes(option, optionsTex, 28, blackHalfTransparent);
+        OptionBoxes(option, optionsTex, 28, blackHalfTransparent);
         if (Raylib.IsKeyPressed(KeyboardKey.W))
         {
             gameState=1;
@@ -99,29 +90,27 @@ while(!Raylib.WindowShouldClose())
         {
             //gameState=3;
         }
-        bar(playerHealth,maxPlayerHealth,"HP",16,new Vector2(650,30),blackHalfTransparent,Color.Red);
-        bar(magicPoint,maxMagicPoint,"MP",16,new Vector2(650,60),blackHalfTransparent,Color.Blue);
-        optionBoxes([new Vector2(710,90)],["Souls: "+currency],16,blackHalfTransparent);
+        Bar(playerHealth,maxPlayerHealth,"HP",16,new Vector2(650,30),blackHalfTransparent,Color.Red);
+        Bar(magicPoint,maxMagicPoint,"MP",16,new Vector2(650,60),blackHalfTransparent,Color.Blue);
+        OptionBoxes([new Vector2(710,90)],["Souls: "+currency],16,blackHalfTransparent);
         Raylib.EndDrawing();
     }
-    //arena
-        //your turn 
-    if (gameState == 1)
+    if (gameState == 1)//combat
     {
         Raylib.BeginDrawing();
         Raylib.ClearBackground(Color.White);
-        bar(playerHealth, maxPlayerHealth, "HP", 40, new Vector2(30,500), blackHalfTransparent, Color.Red);
-        bar(magicPoint, maxMagicPoint, "MP", 40, new Vector2(30,550), blackHalfTransparent, Color.SkyBlue);
+        Bar(playerHealth, maxPlayerHealth, "HP", 40, new Vector2(30,500), blackHalfTransparent, Color.Red);
+        Bar(magicPoint, maxMagicPoint, "MP", 40, new Vector2(30,550), blackHalfTransparent, Color.SkyBlue);
         if(enemyselected==true){
-        bar(enemyHealt, enemyMaxHealt, "HP", 30, new Vector2(550,20), blackHalfTransparent, Color.Red);}
+        Bar(enemyHealt, enemyMaxHealt, "HP", 30, new Vector2(550,20), blackHalfTransparent, Color.Red);}
         if (playerturn==true){
-        optionBoxes(
+        OptionBoxes(
             [new Vector2(30,300),new Vector2(30,350),new Vector2(30,400),new Vector2(30,450) ],
             ["Attack","Skill","Items","Defend"],
             20,
             blackHalfTransparent
         );
-        selectAction1=select(
+        selectAction1=Select(
         selectAction1,4,skill,
         new Vector2(30,250),50,40
         );
@@ -143,13 +132,13 @@ while(!Raylib.WindowShouldClose())
             }
         if (skill == 2)
         {
-            optionBoxes(
+            OptionBoxes(
             [new Vector2(140,250),new Vector2(140,290),new Vector2(140,330),new Vector2(140,370), new Vector2(140,410)],
             skills,
             18,
             blackHalfTransparent
         );
-        selectAction2=select(
+        selectAction2=Select(
         selectAction2,5,0,
         new Vector2(140,210),40,36
         );
@@ -165,10 +154,10 @@ while(!Raylib.WindowShouldClose())
         {
             if (enemyselected == true)
             {
-                playerHealth=playerHealth-enemyattack(enemylevel,defence);
+                playerHealth=playerHealth-EnemyAttack(enemylevel,defence);
             }
             if (enemyselected == false){
-                enemylevel=enemyselect(day);
+                enemylevel=Enemyselect(day);
                 enemyMaxHealt=50+enemylevel*(2+Random.Shared.Next(5));
                 enemyHealt=enemyMaxHealt;
                 enemyselected=true;
@@ -189,13 +178,13 @@ while(!Raylib.WindowShouldClose())
         }       
         Raylib.EndDrawing();
     }
-    if (gameState == 2)
+    if (gameState == 2)//skill upgrading
     {
         Raylib.BeginDrawing();
         Raylib.ClearBackground(Color.White);
         if(Raylib.IsKeyPressed(KeyboardKey.A)){gameState=0;}
-        optionBoxes([new Vector2(170,50),new Vector2(170,100),new Vector2(170,150),new Vector2(170,200),new Vector2(170,250)],["skill 1","skill 2","skill 3","skill 4","skill 5" ],20, blackHalfTransparent);
-        selectAction1=select(selectAction1,5,0,new Vector2(170,0),50,40);
+        OptionBoxes([new Vector2(170,50),new Vector2(170,100),new Vector2(170,150),new Vector2(170,200),new Vector2(170,250)],["skill 1","skill 2","skill 3","skill 4","skill 5" ],20, blackHalfTransparent);
+        selectAction1=Select(selectAction1,5,0,new Vector2(170,0),50,40);
         Raylib.DrawRectangleV(new Vector2(320,50),new Vector2(450,400),blackHalfTransparent);
         Raylib.DrawRectangleLines(320,50,450,400,Color.Black);
         Raylib.DrawText(skillDescription[selectAction1-1],330,60,28,Color.White);
@@ -203,39 +192,26 @@ while(!Raylib.WindowShouldClose())
     }
     if (gameState == 3)
     {
-        notImplemented(40,new Vector2(220,260),0,3,blackHalfTransparent);
     }
-    if (gameState == 4)
+    if (gameState == 4)//rest
     {
         playerHealth=maxPlayerHealth;
         day++;
         gameState=0;
     }
-    if (gameState == 5)
+    if (gameState == 5)//defeat
     {
         Raylib.BeginDrawing();
         Raylib.ClearBackground(Color.White);
         Raylib.DrawText("You lose",250,260,80,Color.Black);
         Raylib.EndDrawing();
     }
-        //shop
-            //shop menu
-                // item descriptions
-        //skill aqusition 
-
-        //rest
-            // restore Healt and change day
-
 }
-static int enemyselect(int day)
+static int Enemyselect(int day)
 {
     return day+Random.Shared.Next(3);
 }
-static int enemyattack(int level, int defend)
+static int EnemyAttack(int level, int defend)
 {
     return level*Random.Shared.Next(5)+5/defend;
-}
-static int enemyattacked(int level, int damage, int debuff)
-{
-    return damage+debuff-(level/Random.Shared.Next(4));
 }
